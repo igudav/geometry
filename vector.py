@@ -4,9 +4,13 @@ from math import sqrt
 
 class Vector(object):
 
+    available_id = 0
+
     def __init__(self, p=Point()):
         self.x = p.x
         self.y = p.y
+        self.myid = Vector.available_id
+        Vector.available_id += 1
 
     def __add__(self, other):
         return Vector(Point(self.x + other.x, self.y + other.y))
