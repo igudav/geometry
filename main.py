@@ -1,17 +1,23 @@
+import sys
 from figures import *
 from algos import *
-import tkinter as tk
+import gui
+from PyQt5 import QtWidgets
 
 
-def Hello(event):
-    print("Yet another hello world")
+class MainApp(QtWidgets.QMainWindow, gui.Ui_MainWindow):
+
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
 
 
-root = tk.Tk()
-btn = tk.Button(root,                  #родительское окно
-             text="Click me",       #надпись на кнопке
-             width=30,height=5,     #ширина и высота
-             bg="white",fg="black") #цвет фона и надписи
-btn.bind("<Button-1>", Hello)       #при нажатии ЛКМ на кнопку вызывается функция Hello
-btn.pack()                          #расположить кнопку на главном окне
-root.mainloop()
+def main():
+    app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
+    window = MainApp()  # Создаём объект класса ExampleApp
+    window.show()  # Показываем окно
+    app.exec_()  # и запускаем приложение
+
+
+if __name__ == '__main__':
+    main()
