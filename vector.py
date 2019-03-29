@@ -1,5 +1,6 @@
 from point import *
 from math import sqrt
+import tkinter as tk
 
 
 class Vector(object):
