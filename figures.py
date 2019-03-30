@@ -86,8 +86,8 @@ class Polygon(Figure):
             return -1
 
     # TODO разобраться с ошибкой при закрытии программы
-    def __del__(self):
-        for a in self.lines:
-            self.cv.delete(a)
-        for b in self.points:
-            self.cv.delete(b)
+    # def __del__(self):
+    #     for a in self.lines:
+    #         self.cv.delete(a)
+    #     for b in self.points:
+    #         self.cv.delete(b)

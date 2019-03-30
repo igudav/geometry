@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import tkinter as tk
 from tkinter import messagebox as mb
 from point import *
@@ -23,6 +25,7 @@ class MainApp(tk.Frame):
         self.setui()
         self.mod = "none"
         self.figs = []
+        self.popup_menu = None
 
     def del_fig(self):
         self.figs.pop()
@@ -111,10 +114,12 @@ class MainApp(tk.Frame):
             pass
 
     def popup(self, event):
-        popup_menu = tk.Menu(self.parent, tearoff=0)
+        if self.popup_menu is not None:
+            self.popup_menu.destroy()
+        self.popup_menu = tk.Menu(self.parent, tearoff=0)
         for i in range(0, len(self.figs)):
-            popup_menu.add_command(label="Fig " + str(i), command=partial(self.select_fig, i))
-        popup_menu.post(event.x_root, event.y_root)
+            self.popup_menu.add_command(label="Fig " + str(i), command=partial(self.select_fig, i))
+        self.popup_menu.post(event.x_root, event.y_root)
 
     def is_conv(self):
         if self.nselected != 1:
