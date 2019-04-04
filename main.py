@@ -21,7 +21,6 @@ class MainApp(tk.Frame):
         self.fig_menu = tk.Menu(self.menubar, tearoff=0)
         self.alg_menu = tk.Menu(self.menubar, tearoff=0)
         self.nselected = 0
-        self.selected_figs = set()
         self.setui()
         self.mod = "none"
         self.figs = []
@@ -83,12 +82,29 @@ class MainApp(tk.Frame):
     def select_fig(self, index):
         res = self.figs[index].select()
         self.nselected += res
-        if res == 1:
-            self.selected_figs.add(self.figs[index])
-        else:
-            self.selected_figs.remove(self.figs[index])
+
+    def del_selected(self):
+        for f in self.figs:
+            if f.selected:
+                self.nselected -= 1
+                f.destroy()
+        self.figs = [f for f in self.figs if not f.destroyed]
+
+    def select_all(self):
+        for f in self.figs:
+            if not f.selected:
+                f.select()
+                self.nselected += 1
+
+    def release_selection(self):
+        for f in self.figs:
+            if f.selected:
+                f.select()
+                self.nselected -= 1
 
     def b1_handler(self, event):
+        if self.popup_menu is not None:
+            self.popup_menu.destroy()
         if self.mod == "placing_pg":
             if len(self.figs[-1].vertexes) > 0:
                 dx = event.x - self.figs[-1].vertexes[0].x
@@ -104,6 +120,7 @@ class MainApp(tk.Frame):
 
     def b3_handler(self, event):
         if self.mod == "placing_pg":
+            # если сразу же передумали добавлять фигуру
             if len(self.figs[-1].vertexes) == 0:
                 self.figs.pop()
                 self.mod = 'none'
@@ -119,13 +136,20 @@ class MainApp(tk.Frame):
         self.popup_menu = tk.Menu(self.parent, tearoff=0)
         for i in range(0, len(self.figs)):
             self.popup_menu.add_command(label="Fig " + str(i), command=partial(self.select_fig, i))
+        self.popup_menu.add_separator()
+        self.popup_menu.add_command(label='Удалить', command=self.del_selected)
+        self.popup_menu.add_command(label='Выделить все', command=self.select_all)
+        self.popup_menu.add_command(label='Снять выделение', command=self.release_selection)
         self.popup_menu.post(event.x_root, event.y_root)
 
     def is_conv(self):
         if self.nselected != 1:
             mb.showerror("Ошибка", "Нужно выделить ровно один многоугольник")
             return
-        f = self.selected_figs.pop()
+        f = None
+        for f in self.figs:
+            if f.selected:
+                break
         res = is_convex(f)
         if res:
             mb.showinfo('Результат', 'Выпуклый')

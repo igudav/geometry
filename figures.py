@@ -15,6 +15,7 @@ class Figure(object):
         self.point_ordinary_style = dict(fill="yellow", outline="black")
         self.line_selected_style = dict(width=4, fill="lightblue")
         self.selected = False
+        self.destroyed = False
 
 
 class Polygon(Figure):
@@ -85,9 +86,16 @@ class Polygon(Figure):
                 self.selected = False
             return -1
 
+    def destroy(self):
+        for a in self.lines:
+            self.cv.delete(a)
+        for b in self.points:
+            self.cv.delete(b)
+        self.destroyed = True
+
     # TODO разобраться с ошибкой при закрытии программы
-    # def __del__(self):
-    #     for a in self.lines:
-    #         self.cv.delete(a)
-    #     for b in self.points:
-    #         self.cv.delete(b)
+    def __del__(self):
+        for a in self.lines:
+            self.cv.delete(a)
+        for b in self.points:
+            self.cv.delete(b)
