@@ -20,6 +20,7 @@ class MainApp(tk.Frame):
         self.select_menu = tk.Menu(self.menubar, tearoff=0)
         self.fig_menu = tk.Menu(self.menubar, tearoff=0)
         self.alg_menu = tk.Menu(self.menubar, tearoff=0)
+        self.coords_status = tk.Label(self.parent, text="x: 0, y: 0", font=("default", 8))
         self.nselected = 0
         self.setui()
         self.mod = "none"
@@ -27,7 +28,8 @@ class MainApp(tk.Frame):
         self.popup_menu = None
 
     def del_fig(self):
-        self.figs.pop()
+        f = self.figs.pop()
+        f.destroy()
         self.cv.delete("follow_last")
         self.cv.delete("follow_first")
         self.mod = "none"
@@ -115,6 +117,7 @@ class MainApp(tk.Frame):
             self.place_point(event)
 
     def motion_handler(self, event):
+        self.coords_status.config(text="x: " + str(event.x) + ", y: " + str(event.y))
         if self.mod == "placing_pg":
             self.follow_placing_pg(event)
 
@@ -158,6 +161,18 @@ class MainApp(tk.Frame):
         f.select()
         self.nselected -= 1
 
+    def show_sp(self):
+        if self.nselected != 1:
+            mb.showerror("Ошибка", "Нужно выделить ровно один многоугольник")
+            return
+        f: Polygon = None
+        for f in self.figs:
+            if f.selected:
+                break
+        mb.showinfo("Результат", "Периметр: %.3f \n Площадь: %.3f" % (get_perimeter(f), get_square(f)))
+        f.select()
+        self.nselected -= 1
+
     def setui(self):
         self.parent.title("Geometry")
         self.pack(fill=tk.BOTH, expand=1)
@@ -167,9 +182,12 @@ class MainApp(tk.Frame):
         self.cv.bind("<Motion>", self.motion_handler)
         self.cv.bind("<3>", self.b3_handler)
 
+        self.coords_status.pack()
+
         self.parent.config(menu=self.menubar)
         self.fig_menu.add_command(label="Многоугольник", command=self.start_setting_pg)
         self.alg_menu.add_command(label="Выпуклый?", command=self.is_conv)
+        self.alg_menu.add_command(label='S, P', command=self.show_sp)
         self.menubar.add_cascade(label="Фигуры", menu=self.fig_menu)
         self.menubar.add_cascade(label='Алгоритмы', menu=self.alg_menu)
 
